@@ -12,6 +12,7 @@ data/*
 
 # Outputs folder
 outputs/*
+test/*
 # Distribution / packaging
 .Python
 build/
