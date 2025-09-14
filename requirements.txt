@@ -2,8 +2,7 @@ numpy
 pandas
 matplotlib
 scikit-learn
-xgboost
-catboost
+imbalanced-learn
 dill
 Flask
 -e .

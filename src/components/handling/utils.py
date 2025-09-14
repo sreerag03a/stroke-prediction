@@ -26,3 +26,24 @@ def download_data(data_dir):
             logging.info(f'Dataset successfully saved at {src_file}')
         except Exception as e:
             raise CustomException(e,sys)
+        
+def save_obj(filepath,obj):
+    # To pickle models or fitted preprocessor
+
+    try:
+        dir_path = os.path.dirname(filepath)
+        os.makedirs(dir_path,exist_ok=True)
+
+        with open(filepath,"wb") as fileobj:
+            dill.dump(obj, fileobj)
+
+    except Exception as e:
+        raise CustomException(e,sys)
+
+def load_obj(filepath):
+    #Load pickled object
+    try:
+        with open(filepath, "rb") as f:
+            return dill.load(f)
+    except Exception as e:
+        raise CustomException(e,sys)
