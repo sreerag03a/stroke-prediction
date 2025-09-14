@@ -1,10 +1,10 @@
 #basic utils
-from src.components.handling import logger
+from src.handling import logger
 import logging
-from src.components.handling.exceptions import CustomException
+from src.handling.exceptions import CustomException
 import os
 import sys
-from src.components.handling.utils import save_obj
+from src.handling.utils import save_obj
 from dataclasses import dataclass
 
 #important modules

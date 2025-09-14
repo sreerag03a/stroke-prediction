@@ -1,6 +1,6 @@
 import sys
 import logging
-from src.components.handling import logger
+from src.handling import logger
 
 '''
 Exception handing

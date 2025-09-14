@@ -3,8 +3,8 @@ import sys
 import numpy as np
 import pandas as pd
 import dill
-from src.components.handling.logger import logging
-from src.components.handling.exceptions import CustomException
+from src.handling.logger import logging
+from src.handling.exceptions import CustomException
 from kaggle.api.kaggle_api_extended import KaggleApi
 
 

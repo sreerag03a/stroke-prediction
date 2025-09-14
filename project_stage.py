@@ -2,11 +2,11 @@ import os
 import sys
 import numpy as np
 
-from src.components.handling.logger import logging
-from src.components.handling.exceptions import CustomException  
-from src.components.handling.utils import download_data
-from src.components.model.data_transform import DataIngestion,DataTransform
-from src.components.pipeline.train_pipeline import ImbalanceHandling
+from src.handling.logger import logging
+from src.handling.exceptions import CustomException  
+from src.handling.utils import download_data
+from src.model.data_transform import DataIngestion,DataTransform
+from src.pipeline.train_pipeline import ImbalanceHandling
 
 DATA_DIR = os.path.join(os.getcwd(),"data")
 os.makedirs(DATA_DIR,exist_ok=True)
