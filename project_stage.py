@@ -6,7 +6,7 @@ from src.handling.logger import logging
 from src.handling.exceptions import CustomException  
 from src.handling.utils import download_data
 from src.model.data_transform import DataIngestion,DataTransform
-from src.pipeline.train_pipeline import ImbalanceHandling
+from src.pipeline.train_pipeline import Train_Pipeline
 
 DATA_DIR = os.path.join(os.getcwd(),"data")
 os.makedirs(DATA_DIR,exist_ok=True)
@@ -28,10 +28,8 @@ if __name__ == "__main__":
         incomplete_train_data,test_data = data_transform.start_transform(train_path,test_path)
 
         # print(np.where(np.isnan(incomplete_train_data)))
-        sampler = ImbalanceHandling()
-        oversampler = SMOTE()
-        x_train,y_train = sampler.start_oversample(incomplete_train_data,oversampler=oversampler)
-        print(x_train.shape)
-
+        trainer = Train_Pipeline()
+        models = trainer.train_models(incomplete_train_data,test_data)
+        print(models)
     except Exception as e:
         raise CustomException(e,sys)

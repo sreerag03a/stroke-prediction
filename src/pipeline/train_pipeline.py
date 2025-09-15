@@ -7,52 +7,97 @@ import sys
 from src.handling.utils import save_obj
 from dataclasses import dataclass
 
+
 #important modules
 import pandas as pd
 import numpy as np
 
+from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier,VotingClassifier
+from sklearn.naive_bayes import GaussianNB,MultinomialNB
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
 
-from imblearn.over_sampling import SMOTE,ADASYN,BorderlineSMOTE,SMOTENC
+
+from src.model.model_trainer import evaluate_models
+
+
+
+from imblearn.over_sampling import SMOTE,ADASYN,BorderlineSMOTE
+from imblearn.pipeline import Pipeline
 
 @dataclass
-class DataHandlingConfig:
-    transformed_data_path:str = os.path.join('outputs','ogdata_oversampled.csv')
-
-class ImbalanceHandling:
-    def __init__(self):
-        self.datahandleconfig = DataHandlingConfig()
-    
-    def start_oversample(self,train_data,oversampler):
-        x_train = train_data[:,:-1]
-        y_train = train_data[:,-1]
-
-        logging.info("Started resample")
-        x_resampled,y_resampled = oversampler.fit_resample(x_train,y_train)
-        logging.info('Resample completed with new training set of {} rows'.format(x_resampled.shape[0]))
-
-        # This was done because the resampling seemed to give values in between 0 and 1 for certain columns
-        encode_columns = [1,2,3,4,5,6,7,9,10]
-        x_resampled[:,encode_columns] = np.round(x_resampled[:,encode_columns])
-
-        combined = np.c_[x_resampled,y_resampled]
-        newdf = pd.DataFrame(combined)
-        newdf.to_csv(self.datahandleconfig.transformed_data_path,index=False,header=False)
-        return(
-            x_resampled,
-            y_resampled
-        )
-
+class ModelConfig:
+    models_config = os.path.join('outputs','models')
+    trained_model_path = os.path.join('outputs','models','trained_model.pkl')
 
 class Train_Pipeline:
 
     def __init__(self):
-        pass
+        self.config = ModelConfig()
 
-    def oversample_comb(self,train_data):
+    def get_pipelines(self,models_dict:dict):
         oversamplers = {
             'SMOTE' : SMOTE(),
-            'SMOTENC': SMOTENC(),
             'ADASYN': ADASYN(),
             'BorderlineSMOTE': BorderlineSMOTE()
         }
 
+        pipelines = {}
+        for oversampler_name,oversampler in oversamplers.items():
+            for model_name,model in models_dict.items():
+                pipelines[f'{oversampler_name}_{model_name}'] = Pipeline([
+                    ('sampler', oversampler),
+                    ('model',model)
+                ])
+        self.pipelines=pipelines
+        return pipelines
+    
+    def train_models(self,train_set,test_set):
+        os.makedirs(self.config.models_config, exist_ok=True)
+        models = {
+            "Logistic Regression" : LogisticRegression(),
+            "Random Forest Classifier" : RandomForestClassifier(),
+            "Support Vector Machine" : SVC(),
+            "Gaussian Naive Bayes" : GaussianNB(),
+            "Multinomial Naive Bayes" : MultinomialNB(),
+            "XGBoost" : XGBClassifier()
+        }
+        params ={
+            "Logistic Regression" : {},
+            'Random Forest Classifier' : {},
+            "Support Vector Machine" : {},
+            "Gaussian Naive Bayes" : {},
+            "Multinomial Naive Bayes" : {},
+            "XGBoost" : {}
+        }
+        try:
+            logging.info("Initializing train and test sets")
+            X_train,y_train,X_test,y_test = (
+                    train_set[:,:-1],
+                    train_set[:,-1],
+                    test_set[:,:-1],
+                    test_set[:,-1]
+                )
+            models_path = os.path.join(self.config.models_config)
+            pipelines = self.get_pipelines(models)
+            results,fitted_models = evaluate_models(X_train,y_train,X_test,y_test,pipelines,params)
+            finalized_models = {}
+            for model, os_scores in results.items():
+                max_score_index = np.argmax(list(os_scores.values()))
+                print(f'{model} scores : {(os_scores.values())}')
+                best_model = list(fitted_models[model].values())[max_score_index]
+                finalized_models[model] = best_model
+                print(f'{model} : {list(os_scores.values())[max_score_index]}')
+
+            for modelname,model in finalized_models.items():
+                savepath = os.path.join(models_path,f'{modelname}.pkl')
+                save_obj(savepath,model)
+                
+            return 'finished'
+                
+        except Exception as e:
+            raise CustomException(e,sys)
+
+        
