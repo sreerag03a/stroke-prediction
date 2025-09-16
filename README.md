@@ -45,7 +45,11 @@ This automatically downloads the data and trains all the models (Note that this 
 
 ### Evaluation Metrics
 
+- Accuracy
 - Recall
-- F1 Score
+- Precision
+- $F_1$ Score
+- $F_\beta$ Score
 - ROC AUC
 - PR AUC
+- Matthews Correlation Coefficient (MCC) - Also called the Phi ($\phi$) coefficient

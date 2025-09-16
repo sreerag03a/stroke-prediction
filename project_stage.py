@@ -33,8 +33,7 @@ if __name__ == "__main__":
 
         # print(np.where(np.isnan(incomplete_train_data)))
         trainer = Train_Pipeline()
-        models = trainer.train_models(incomplete_train_data,test_data)
-        print(models)
+        trainer.train_models(incomplete_train_data,test_data)
 
         logging.info('Project successfully staged.')
     except Exception as e:

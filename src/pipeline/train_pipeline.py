@@ -6,7 +6,7 @@ import os
 import sys
 from src.handling.utils import save_obj
 from dataclasses import dataclass
-
+import json
 
 #important modules
 import pandas as pd
@@ -32,6 +32,7 @@ from imblearn.pipeline import Pipeline
 class ModelConfig:
     models_config = os.path.join('outputs','models')
     trained_model_path = os.path.join('outputs','models','trained_model.pkl')
+    model_scores_path = os.path.join('outputs','model_scores.json')
 
 class Train_Pipeline:
 
@@ -68,18 +69,18 @@ class Train_Pipeline:
         }
         params ={
             "Logistic Regression" : {
-                'model__max_iter':[1500,4000],
-                'model__C': [0.001,0.01, 0.1, 1, 10],
+                'model__max_iter':[4000],
+                'model__C': [0.01, 0.1, 1, 10],
                 'model__penalty': ['l2'],
                 'model__solver': ['lbfgs', 'liblinear', 'saga','sag']
             },
             'Random Forest Classifier' : {
-                'model__n_estimators': [50, 100, 300],
+                'model__n_estimators': [100, 300],
                 'model__max_depth': [5, 10, 15,20],
                 'model__min_samples_split': [2, 5, 8],
                 'model__min_samples_leaf': [1, 2, 3],
                 'model__max_features': ['sqrt', 'log2'],
-                'model__class_weight': ['balanced', 'balanced_subsample']
+                'model__class_weight': ['balanced']
             },
             "Linear SVC" :{
                 'model__C': [0.01,0.1, 1, 10, 100],
@@ -106,8 +107,7 @@ class Train_Pipeline:
                 'model__learning_rate': [0.01,0.1],
                 "model__max_depth": [3, 5],
                 "model__num_leaves": [31, 63],
-                "model__class_weight": ['balanced'],
-                "model__boosting_type": ['gbdt','dart']
+                "model__class_weight": ['balanced']
             },
             'K Neighbors Classifier': {
                 'model__n_neighbors':[5,8,12],
@@ -131,6 +131,7 @@ class Train_Pipeline:
             pipelines = self.get_pipelines(models)
             results,fitted_models,all_scores = evaluate_models(X_train,y_train,X_test,y_test,pipelines,params)
             finalized_models = {}
+            saved_scores = {}
             for model, os_scores in results.items():
                 max_score_index = np.argmax(list(os_scores.values()))
 
@@ -138,7 +139,10 @@ class Train_Pipeline:
                 best_model_oversampler = list(all_scores[model])[max_score_index]
                 model_scores = all_scores[model][best_model_oversampler]
                 print(f'{model}: {model_scores}')
+                saved_scores[model] = model_scores
                 finalized_models[model] = best_model
+            with open(self.config.model_scores_path,'w') as f:
+                json.dump(saved_scores,f,indent=4)
 
             for modelname,model in finalized_models.items():
                 savepath = os.path.join(models_path,f'{modelname}.pkl')

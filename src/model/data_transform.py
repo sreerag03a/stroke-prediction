@@ -43,10 +43,8 @@ class DataIngestion:
         try:
             df = pd.read_csv(datapath)
             
-            df_copy = df.iloc[:,[1,2,3,4,8,9,10,11]]
+            df_copy = df.drop('id',axis=1)
             logging.info('Successfully ingested data as a Dataframe')
-            for col in ["hypertension","heart_disease"]:
-                df_copy[col] = df_copy[col].astype(int)
             os.makedirs(os.path.dirname(self.ingest_conf.train_data_path), exist_ok= True)
             nrow,ncol = df.shape
 
@@ -91,7 +89,7 @@ class DataTransform:
             
             impute_column = ['bmi']
 
-            encode_columns = ['gender','smoking_status']
+            encode_columns = ['gender','smoking_status','ever_married','work_type','Residence_type']
 
             numerical_cols = ['avg_glucose_level','bmi']
 
@@ -99,7 +97,7 @@ class DataTransform:
 
             preprocessor = ColumnTransformer(
                 [('imputer',SimpleImputer(strategy='mean'),impute_column),
-                ('encoder',self.OHencoder,encode_columns),
+                ('encoder',self.OHencoder,encode_columns)
                 
                 ],remainder='passthrough'
             )   

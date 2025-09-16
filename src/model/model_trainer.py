@@ -6,7 +6,7 @@ import sys
 from collections import Counter
 
 from sklearn.model_selection import GridSearchCV,StratifiedKFold
-from sklearn.metrics import recall_score,f1_score,roc_auc_score,average_precision_score
+from sklearn.metrics import f1_score,roc_auc_score,average_precision_score,precision_recall_fscore_support,matthews_corrcoef
 
 
     
@@ -44,13 +44,17 @@ def evaluate_models(X_train,y_train,X_test,y_test,pipelines,params):
             roc_auc = roc_auc_score(y_test, y_proba)
             pr_auc = average_precision_score(y_test, y_proba)
 
-            recall = recall_score(y_test,ypreds)
+            precision,recall,fbeta,_ = precision_recall_fscore_support(y_test,ypreds)
+            mcc = matthews_corrcoef(y_test,ypreds)
             f1score= f1_score(y_test,ypreds)
             scores = {'accuracy': accuracy,
                       'f1_score' : f1score,
-                      'recall': recall,
+                      'f-beta': fbeta[1],
+                      'precision': precision[1],
+                      'recall': recall[1],
                       'ROC AUC': roc_auc,
-                      'PR_AUC' : pr_auc}
+                      'PR_AUC' : pr_auc,
+                      'mcc': mcc}
             if modelname not in results:
                 results[modelname] = {}
             if modelname not in fitted_models:
