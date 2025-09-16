@@ -12,15 +12,19 @@ DATA_DIR = os.path.join(os.getcwd(),"data")
 os.makedirs(DATA_DIR,exist_ok=True)
 
 
-from imblearn.over_sampling import SMOTE,ADASYN,BorderlineSMOTE
+'''
+Note:
 
+Running this script will take some time due to the number of models to learn, oversampling and the Grid Search Cross validation.
+
+'''
 if __name__ == "__main__":
     try:
-        logging.info("Attempting to download stroke dataset from kaggle...")
-        download_data(DATA_DIR)
+        # logging.info("Attempting to download stroke dataset from kaggle...")
+        # download_data(DATA_DIR)
 
         print("Check outputs/logs for logs if something goes wrong")
-        logging.info('Downloaded stroke dataset.')
+        # logging.info('Downloaded stroke dataset.')
 
         data_ingest = DataIngestion(0.3)
         train_path,test_path = data_ingest.start_ingest()
@@ -31,5 +35,7 @@ if __name__ == "__main__":
         trainer = Train_Pipeline()
         models = trainer.train_models(incomplete_train_data,test_data)
         print(models)
+
+        logging.info('Project successfully staged.')
     except Exception as e:
         raise CustomException(e,sys)
