@@ -19,7 +19,7 @@ from sklearn.svm import LinearSVC
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from sklearn.neighbors import KNeighborsClassifier
-
+from sklearn.calibration import CalibratedClassifierCV
 
 from src.model.model_trainer import evaluate_models
 
@@ -42,7 +42,8 @@ class Train_Pipeline:
     def get_pipelines(self,models_dict:dict):
         oversamplers = {
             'SMOTE' : SMOTE(),
-            'ADASYN': ADASYN()
+            'ADASYN': ADASYN(),
+            'BorderlineSMOTE': BorderlineSMOTE()
         }
 
         pipelines = {}
@@ -60,16 +61,16 @@ class Train_Pipeline:
         models = {
             "Logistic Regression" : LogisticRegression(class_weight="balanced"),
             "Random Forest Classifier" : RandomForestClassifier(),
-            "Linear SVC" : LinearSVC(class_weight="balanced"),
+            "Linear SVC" : CalibratedClassifierCV(LinearSVC(max_iter=10000),method = 'sigmoid',cv = 3),
             "XGBoost Classifier" : XGBClassifier(scale_pos_weight=21.5),
             "Gradient Boosting Classifier" : GradientBoostingClassifier(),
-            "LightGBM Classifier" : LGBMClassifier(class_weight="balanced"),
+            "LightGBM Classifier" : LGBMClassifier(class_weight='balanced'),
             "K Neighbors Classifier": KNeighborsClassifier()
 
         }
         params ={
             "Logistic Regression" : {
-                'model__max_iter':[4000],
+                'model__max_iter':[10000],
                 'model__C': [0.01, 0.1, 1, 10],
                 'model__penalty': ['l2'],
                 'model__solver': ['lbfgs', 'liblinear', 'saga','sag']
@@ -83,11 +84,11 @@ class Train_Pipeline:
                 'model__class_weight': ['balanced']
             },
             "Linear SVC" :{
-                'model__C': [0.01,0.1, 1, 10, 100],
-                'model__penalty' : ['l1','l2'],
-                'model__max_iter':[1500,4000],
-                'model__class_weight': ['balanced'],
-                'model__dual': [False]
+                'model__estimator__C': [0.01,0.1, 1, 10, 100],
+                'model__estimator__penalty' : ['l1','l2'],
+                'model__estimator__max_iter':[10000],
+                'model__estimator__class_weight': ['balanced'],
+                'model__estimator__dual': [False]
             },
             "XGBoost Classifier" : {
                 'model__n_estimators': [100, 300],
@@ -104,10 +105,10 @@ class Train_Pipeline:
             },
             "LightGBM Classifier" : {
                 'model__n_estimators': [150,300],
-                'model__learning_rate': [0.01,0.1],
+                'model__learning_rate': [0.01,0.1,1],
                 "model__max_depth": [3, 5],
-                "model__num_leaves": [31, 63],
-                "model__class_weight": ['balanced']
+                "model__num_leaves": [31, 63, 120],
+                "model__min_child_samples":[40,80,100]
             },
             'K Neighbors Classifier': {
                 'model__n_neighbors':[5,8,12],
@@ -135,18 +136,18 @@ class Train_Pipeline:
             for model, os_scores in results.items():
                 max_score_index = np.argmax(list(os_scores.values()))
 
-                best_model = list(fitted_models[model].values())[max_score_index]
+                best_model,threshold = list(fitted_models[model].values())[max_score_index]
                 best_model_oversampler = list(all_scores[model])[max_score_index]
                 model_scores = all_scores[model][best_model_oversampler]
                 print(f'{model}: {model_scores}')
                 saved_scores[model] = model_scores
-                finalized_models[model] = best_model
+                finalized_models[model] = [best_model,threshold]
             with open(self.config.model_scores_path,'w') as f:
                 json.dump(saved_scores,f,indent=4)
 
             for modelname,model in finalized_models.items():
                 savepath = os.path.join(models_path,f'{modelname}.pkl')
-                save_obj(savepath,model)
+                save_obj(savepath,model[0],model[1])
                 
             return 'finished'
                 

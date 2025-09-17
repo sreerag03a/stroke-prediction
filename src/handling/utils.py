@@ -29,7 +29,7 @@ def download_data(data_dir):
         except Exception as e:
             raise CustomException(e,sys)
         
-def save_obj(filepath,obj):
+def save_obj(filepath,obj,*args):
     # To pickle models or fitted preprocessor
 
     try:
@@ -37,10 +37,11 @@ def save_obj(filepath,obj):
         os.makedirs(dir_path,exist_ok=True)
 
         with open(filepath,"wb") as fileobj:
-            dill.dump(obj, fileobj)
+            dill.dump((obj,*args), fileobj)
 
     except Exception as e:
         raise CustomException(e,sys)
+    
 
 def load_obj(filepath):
     #Load pickled object

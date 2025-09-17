@@ -53,3 +53,7 @@ This automatically downloads the data and trains all the models (Note that this 
 - ROC AUC
 - PR AUC
 - Matthews Correlation Coefficient (MCC) - Also called the Phi ($\phi$) coefficient
+
+### Model Performance
+
+![Model Performance](outputs/metrics.png)

@@ -12,6 +12,7 @@ data/*
 
 # Outputs folder
 outputs/*
+!outputs/metrics.png
 test/*
 # Distribution / packaging
 .Python
