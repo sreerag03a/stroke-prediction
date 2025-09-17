@@ -8,10 +8,11 @@ from collections import Counter
 from sklearn.model_selection import GridSearchCV,StratifiedKFold
 from sklearn.metrics import f1_score,roc_auc_score,average_precision_score,precision_recall_fscore_support,matthews_corrcoef,precision_recall_curve
 
+from sklearn.metrics import precision_score,recall_score
 
     
 def evaluate_models(X_train,y_train,X_test,y_test,pipelines,params):
-#To tune different models based on eval_metric
+#To tune different models based on evaluation metric
     try:
         results = {}
         fitted_models = {}
@@ -36,17 +37,14 @@ def evaluate_models(X_train,y_train,X_test,y_test,pipelines,params):
 
             accuracy = fitted_model.score(X_test,y_test)
 
-            
-
-            # if hasattr(fitted_model,"predict_proba"):
-            #     y_proba = fitted_model.predict_proba(X_test)[:,1]
-            # elif hasattr(fitted_model,"decision_function"):
-            #     y_proba = fitted_model.decision_function(X_test)
-            # else:
-            #     y_proba = None
             roc_auc = roc_auc_score(y_test, y_proba)
             pr_auc = average_precision_score(y_test, y_proba)
 
+
+            '''
+            This part is done to independently set the thresholds (to improve the )
+            
+            '''
             ypreds = (y_proba >= threshold_val).astype(int)
 
             precision,recall,fbeta,_ = precision_recall_fscore_support(y_test,ypreds,beta = 0.5)
@@ -79,6 +77,14 @@ def evaluate_models(X_train,y_train,X_test,y_test,pipelines,params):
 
 
 def find_threshold(model,X_test,y_test):
+
+    '''
+    To find the best threshold (at which the model classifies) so that it gives the best performance
+
+    Here I have used a combination of recall and precision to maximize both.
+    But from testing, the precision and accuracy takes a hit but this method seems to maximize recall, which is important for medical cases.
+    
+    '''
     
     y_proba = model.predict_proba(X_test)[:,1]
 
@@ -87,7 +93,10 @@ def find_threshold(model,X_test,y_test):
     scores = []
     for t in thresholds:
         ypred = (y_proba >= t).astype(int)
-        scores.append(f1_score(y_test,ypred))
+        recallscore = recall_score(y_test,ypred)
+        precisionscore = precision_score(y_test,ypred)
+        comb_score = recallscore*precisionscore
+        scores.append(comb_score)
 
     best_index = scores.index(max(scores))
     return thresholds[best_index],y_proba
