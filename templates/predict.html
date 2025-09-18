@@ -9,9 +9,9 @@
         <div class="mb-3">
             <label class="form-label">Gender : </label>
             <select class="form-label" name = "gender">
-                <option value = "Male"{% if prev_input and prev_input.model == 'Male' %}selected{% endif %}>Male</option>
-                <option value = "Female"{% if prev_input and prev_input.model == 'Female' %}selected{% endif %}>Female</option>
-                <option value = "Other"{% if prev_input and prev_input.model == 'Other' %}selected{% endif %}>Other</option>
+                <option value = "Male"{% if prev_input and prev_input.gender == 'Male' %}selected{% endif %}>Male</option>
+                <option value = "Female"{% if prev_input and prev_input.gender == 'Female' %}selected{% endif %}>Female</option>
+                <option value = "Other"{% if prev_input and prev_input.gender == 'Other' %}selected{% endif %}>Other</option>
             </select>
         </div>
 
@@ -25,8 +25,8 @@
         <div class="mb-3">
             <label class="form-label">Hypertension : </label>
             <select class="form-label" name = "hypertension">
-                <option value = 1{% if prev_input and prev_input.model == 1 %}selected{% endif %}>Yes</option>
-                <option value = 0{% if prev_input and prev_input.model == 0 %}selected{% endif %}>No</option>
+                <option value = '1' {% if prev_input and prev_input.hypertension== '1' %}selected{% endif %}>Yes</option>
+                <option value = '0' {% if prev_input and prev_input.hypertension == '0' %}selected{% endif %}>No</option>
             </select>
         </div>
 
@@ -34,35 +34,35 @@
         <div class="mb-3">
             <label class="form-label">Heart Disease : </label>
             <select class="form-label" name = "heart_disease">
-                <option value = 1{% if prev_input and prev_input.model == 1 %}selected{% endif %}>Yes</option>
-                <option value = 0{% if prev_input and prev_input.model == 0 %}selected{% endif %}>No</option>
+                <option value = '1' {% if prev_input and prev_input.heart_disease== '1' %}selected{% endif %}>Yes</option>
+                <option value = '0' {% if prev_input and prev_input.heart_disease == '0' %}selected{% endif %}>No</option>
             </select>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Ever Married : </label>
             <select class="form-label" name = "ever_married">
-                <option value = 'Yes'{% if prev_input and prev_input.model == 1 %}selected{% endif %}>Yes</option>
-                <option value = 'No'{% if prev_input and prev_input.model == 0 %}selected{% endif %}>No</option>
+                <option value = 'Yes' {% if prev_input and prev_input.ever_married == 'Yes' %}selected{% endif %}>Yes</option>
+                <option value = 'No' {% if prev_input and prev_input.ever_married == 'No' %}selected{% endif %}>No</option>
             </select>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Work type : </label>
             <select class="form-label" name = "work_type">
-                <option value = 'Private'{% if prev_input and prev_input.model == 'Private' %}selected{% endif %}>Private</option>
-                <option value = 'Self-employed'{% if prev_input and prev_input.model == 'Self-employed' %}selected{% endif %}>Self-employed</option>
-                <option value = 'Govt_job'{% if prev_input and prev_input.model == 'Govt_job' %}selected{% endif %}>Government Job</option>
-                <option value = 'children'{% if prev_input and prev_input.model == 'children' %}selected{% endif %}>Child/Student</option>
-                <option value = 'Never_worked'{% if prev_input and prev_input.model == 'Never_worked' %}selected{% endif %}>Fresher/Never worked</option>
+                <option value = 'Private'{% if prev_input and prev_input.work_type== 'Private' %}selected{% endif %}>Private</option>
+                <option value = 'Self-employed'{% if prev_input and prev_input.work_type == 'Self-employed' %}selected{% endif %}>Self-employed</option>
+                <option value = 'Govt_job'{% if prev_input and prev_input.work_type == 'Govt_job' %}selected{% endif %}>Government Job</option>
+                <option value = 'children'{% if prev_input and prev_input.work_type == 'children' %}selected{% endif %}>Child/Student</option>
+                <option value = 'Never_worked'{% if prev_input and prev_input.work_type == 'Never_worked' %}selected{% endif %}>Fresher/Never worked</option>
             </select>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Residence type : </label>
             <select class="form-label" name = "Residence_type">
-                <option value = 'Urban'{% if prev_input and prev_input.model == 'Urban' %}selected{% endif %}>Urban</option>
-                <option value = 'Rural'{% if prev_input and prev_input.model == 'Rural' %}selected{% endif %}>Rural</option>
+                <option value = 'Urban'{% if prev_input and prev_input.Residence_type == 'Urban' %}selected{% endif %}>Urban</option>
+                <option value = 'Rural'{% if prev_input and prev_input.Residence_type == 'Rural' %}selected{% endif %}>Rural</option>
             </select>
         </div>
 
@@ -84,10 +84,10 @@
         <div class="mb-3">
             <label class="form-label">Smoking status : </label>
             <select class="form-label" name = "smoking_status">
-                <option value = 'formerly smoked'{% if prev_input and prev_input.model == 'formerly smoked' %}selected{% endif %}>formerly smoked</option>
-                <option value = 'never smoked'{% if prev_input and prev_input.model == 'never smoked' %}selected{% endif %}>never smoked</option>
-                <option value = 'smokes'{% if prev_input and prev_input.model == 'smokes' %}selected{% endif %}>smokes</option>
-                <option value = 'Unknown'{% if prev_input and prev_input.model == 'Unknown' %}selected{% endif %}>Unknown</option>
+                <option value = 'formerly smoked'{% if prev_input and prev_input.smoking_status == 'formerly smoked' %}selected{% endif %}>formerly smoked</option>
+                <option value = 'never smoked'{% if prev_input and prev_input.smoking_status == 'never smoked' %}selected{% endif %}>never smoked</option>
+                <option value = 'smokes'{% if prev_input and prev_input.smoking_status == 'smokes' %}selected{% endif %}>smokes</option>
+                <option value = 'Unknown'{% if prev_input and prev_input.smoking_status == 'Unknown' %}selected{% endif %}>Unknown</option>
             </select>
         </div>
 
@@ -96,13 +96,12 @@
         <select class="form-control" name="model">
     <option value="Majority Voting" {% if prev_input and prev_input.model == 'Majority Voting' %}selected{% endif %}>Majority Voting</option>
     <option value="Averaged Model"{% if prev_input and prev_input.model == 'Averaged Model' %}selected{% endif %}>Averaged Model</option>
-    <option value="Logistic Regression"{% if prev_input and prev_input.model == 'Logistic Regression' %}selected{% endif %}>Logistic Regression</option>
-    <option value="Random Forest Classifier"{% if prev_input and prev_input.model == 'Random Forest Classifier' %}selected{% endif %}>Random Forest Classifier</option>
     <option value="Linear SVC"{% if prev_input and prev_input.model == 'Linear SVC' %}selected{% endif %}>Linear SVC</option>
     <option value="XGBoost Classifier"{% if prev_input and prev_input.model == 'XGBoost Classifier' %}selected{% endif %}>XGBoost Classifier</option>
     <option value="Gradient Boosting Classifier"{% if prev_input and prev_input.model == 'Gradient Boosting Classifier' %}selected{% endif %}>Gradient Boosting Classifier</option>
-    <option value="LightGBM Classifier"{% if prev_input and prev_input.model == 'LightGBM Classifier' %}selected{% endif %}>LightGBM Classifier</option>
     <option value="K Neighbors Classifier"{% if prev_input and prev_input.model == 'K Neighbors Classifier' %}selected{% endif %}>K Neighbors Classifier</option>
+    <option value="Voting Classifier"{% if prev_input and prev_input.model == 'Voting Classifier' %}selected{% endif %}>Voting Classifier</option>
+    <option value="Stacking Classifier"{% if prev_input and prev_input.model == 'Stacking Classifier' %}selected{% endif %}>Stacking Classifier</option>
 </select>
 <h1>OR</h1>
 
@@ -119,6 +118,15 @@
         </div>
         </form>
     </div>
-<h2>The patient is predicted to {{ 'have stroke.' if results == 1 else 'not have stroke.' }}</h2>
+<h2>
+  The patient is predicted to
+  {% if results is defined %}
+    {{ 'have stroke.' if results[0] == 1 else 'not have stroke.' }}
+    ({{ '%0.0f' | format(results[1]) }} % risk to have stroke.)
+  {% else %}
+  <br>
+    Please submit input to get prediction.
+  {% endif %}
+</h2>
   </body>
 </html>

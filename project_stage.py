@@ -20,6 +20,8 @@ Running this script will take some time due to the number of models to learn, ov
 '''
 if __name__ == "__main__":
     try:
+        ## Un-comment this to download the dataset
+        
         # logging.info("Attempting to download stroke dataset from kaggle...")
         # download_data(DATA_DIR)
 

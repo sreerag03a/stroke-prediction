@@ -14,8 +14,8 @@ import numpy as np
 
 from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier
-from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier, VotingClassifier,StackingClassifier
+from sklearn.svm import LinearSVC,SVC
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -26,7 +26,9 @@ from src.model.model_trainer import evaluate_models
 
 
 from imblearn.over_sampling import SMOTE,ADASYN,BorderlineSMOTE
+from imblearn.combine import SMOTEENN,SMOTETomek
 from imblearn.pipeline import Pipeline
+from imblearn import FunctionSampler
 
 @dataclass
 class ModelConfig:
@@ -41,9 +43,10 @@ class Train_Pipeline:
 
     def get_pipelines(self,models_dict:dict):
         oversamplers = {
+            'None': FunctionSampler(func=None), # No oversampling
             'SMOTE' : SMOTE(),
             'ADASYN': ADASYN(),
-            'BorderlineSMOTE': BorderlineSMOTE()
+            'SMOTEENN':SMOTEENN()
         }
 
         pipelines = {}
@@ -58,35 +61,24 @@ class Train_Pipeline:
     
     def train_models(self,train_set,test_set):
         os.makedirs(self.config.models_config, exist_ok=True)
+        base_models = [
+            ('lr', LogisticRegression(max_iter=10000,class_weight='balanced')),
+            ('rf', RandomForestClassifier(class_weight='balanced')),
+            ('svc', SVC(probability=True,class_weight='balanced'))
+        ]
         models = {
-            "Logistic Regression" : LogisticRegression(class_weight="balanced"),
-            "Random Forest Classifier" : RandomForestClassifier(),
-            "Linear SVC" : CalibratedClassifierCV(LinearSVC(max_iter=10000),method = 'sigmoid',cv = 3),
+            "Linear SVC" : CalibratedClassifierCV(LinearSVC(max_iter=10000),method = 'sigmoid',cv = 5),
             "XGBoost Classifier" : XGBClassifier(scale_pos_weight=21.5),
             "Gradient Boosting Classifier" : GradientBoostingClassifier(),
-            "LightGBM Classifier" : LGBMClassifier(class_weight='balanced'),
-            "K Neighbors Classifier": KNeighborsClassifier()
+            "K Neighbors Classifier": KNeighborsClassifier(),
+            "Voting Classifier" : VotingClassifier(estimators=base_models,voting='soft'),
+            "Stacking Classifier": StackingClassifier(estimators=base_models,final_estimator=LGBMClassifier(class_weight='balanced'))
 
         }
         params ={
-            "Logistic Regression" : {
-                'model__max_iter':[10000],
-                'model__C': [0.01, 0.1, 1, 10],
-                'model__penalty': ['l2'],
-                'model__solver': ['lbfgs', 'liblinear', 'saga','sag']
-            },
-            'Random Forest Classifier' : {
-                'model__n_estimators': [100, 300],
-                'model__max_depth': [5, 10, 15,20],
-                'model__min_samples_split': [2, 5, 8],
-                'model__min_samples_leaf': [1, 2, 3],
-                'model__max_features': ['sqrt', 'log2'],
-                'model__class_weight': ['balanced']
-            },
             "Linear SVC" :{
                 'model__estimator__C': [0.01,0.1, 1, 10, 100],
                 'model__estimator__penalty' : ['l1','l2'],
-                'model__estimator__max_iter':[10000],
                 'model__estimator__class_weight': ['balanced'],
                 'model__estimator__dual': [False]
             },
@@ -103,18 +95,32 @@ class Train_Pipeline:
                 'model__max_depth': [3, 5],
                 'model__min_samples_leaf': [1, 2, 4]
             },
-            "LightGBM Classifier" : {
-                'model__n_estimators': [150,300],
-                'model__learning_rate': [0.01,0.1,1],
-                "model__max_depth": [3, 5],
-                "model__num_leaves": [31, 63, 120],
-                "model__min_child_samples":[40,80,100]
-            },
             'K Neighbors Classifier': {
                 'model__n_neighbors':[5,8,12],
                 'model__weights':['distance','uniform'],
                 'model__algorithm':['ball_tree','kd_tree','brute'],
                 'model__leaf_size':[30,50]
+            },
+            "Voting Classifier" : {
+                # 'model__lr__C': [0.01, 0.1, 1, 10],
+                'model__lr__solver': ['lbfgs', 'liblinear', 'saga'],
+                'model__rf__n_estimators': [100, 300],
+                # 'model__rf__max_depth': [5, 10],
+                'model__svc__C': [0.1, 1, 10],
+                # 'model__svc__kernel': ['linear', 'rbf']
+            },
+            "Stacking Classifier": {
+                # 'model__lr__C': [0.01, 0.1, 1, 10],
+                'model__lr__solver': ['lbfgs', 'liblinear', 'saga'],
+                'model__rf__n_estimators': [150, 300],
+                # 'model__rf__max_depth': [5, 10],
+                'model__svc__C': [0.1, 1, 10],
+                # 'model__svc__kernel': ['linear', 'rbf'],
+                'model__final_estimator__n_estimators': [150,300],
+                'model__final_estimator__learning_rate': [0.01,0.1],
+                # "model__final_estimator__max_depth": [3, 5],
+                # "model__final_estimator__num_leaves": [31, 63],
+                # "model__final_estimator__min_child_samples":[40,80]
             }
              
         }
@@ -154,4 +160,3 @@ class Train_Pipeline:
         except Exception as e:
             raise CustomException(e,sys)
 
-        

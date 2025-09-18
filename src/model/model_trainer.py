@@ -17,7 +17,7 @@ def evaluate_models(X_train,y_train,X_test,y_test,pipelines,params):
         results = {}
         fitted_models = {}
         all_scores= {}
-        # cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
         for i in range(len(list(pipelines.items()))):
             name,pipe = list(pipelines.items())[i]
             modelname = name.split('_')[1]
@@ -93,9 +93,8 @@ def find_threshold(model,X_test,y_test):
     scores = []
     for t in thresholds:
         ypred = (y_proba >= t).astype(int)
-        recallscore = recall_score(y_test,ypred)
-        precisionscore = precision_score(y_test,ypred)
-        comb_score = recallscore*precisionscore
+        f1score = f1_score(y_test,ypred)
+        comb_score = f1score
         scores.append(comb_score)
 
     best_index = scores.index(max(scores))

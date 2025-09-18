@@ -22,9 +22,9 @@ class PredictPipeline:
         
         '''
         try:
-            lgbm,lgbm_threshold = load_obj('outputs/models/LightGBM Classifier.pkl')
+            stacking,stacking_threshold = load_obj('outputs/models/Stacking Classifier.pkl')
             lsvc,lsvc_threshold = load_obj('outputs/models/Linear SVC.pkl')
-            lgr, lgr_threshold = load_obj('outputs/models/Logistic Regression.pkl')
+            voting,voting_threshold = load_obj('outputs/models/Voting Classifier.pkl')
 
             preprocessor_path = 'outputs/models/preprocessor.pkl'
             logging.info('Loading preprocessor for data...')
@@ -39,29 +39,29 @@ class PredictPipeline:
             if selected_model == 'Majority Voting':
 
                 logging.info('Loading model predictions')
-                lgbm_proba = lgbm.predict_proba(data_transformed)[:,1]
-                lgbm_pred = (lgbm_proba>= lgbm_threshold).astype(int)
+                stacking_proba = stacking.predict_proba(data_transformed)[:,1]
+                stacking_pred = (stacking_proba>= stacking_threshold).astype(int)
 
                 lsvc_proba = lsvc.predict_proba(data_transformed)[:,1]
                 lsvc_pred = (lsvc_proba>= lsvc_threshold).astype(int)
 
-                lgr_proba = lgr.predict_proba(data_transformed)[:,1]
-                lgr_pred = (lgr_proba>= lgr_threshold).astype(int)
-
-                predictions = [lgbm_pred[0],lsvc_pred[0],lgr_pred[0]]
+                voting_proba = voting.predict_proba(data_transformed)[:,1]
+                voting_pred = (voting_proba>= voting_threshold).astype(int)
+                probs = [stacking_proba,lsvc_proba,voting_proba]
+                predictions = [stacking_pred[0],lsvc_pred[0],voting_pred[0]]
                 logging.info(predictions)
-                return maj_vote(predictions)
+                return maj_vote(predictions),(np.mean(probs))*100
             
             elif selected_model == 'Averaged Model':
 
                 logging.info('Loading model predictions')
-                lgbm_proba = lgbm.predict_proba(data_transformed)[:,1]
+                stacking_proba = stacking.predict_proba(data_transformed)[:,1]
 
                 lsvc_proba = lsvc.predict_proba(data_transformed)[:,1]
 
-                lgr_proba = lgr.predict_proba(data_transformed)[:,1]
+                voting_proba = voting.predict_proba(data_transformed)[:,1]
 
-                probs = [lgbm_proba,lsvc_proba,lgr_proba]
+                probs = [stacking_proba,lsvc_proba,voting_proba]
                 logging.info(probs)
                 
                 return averaging_prob(probs)
@@ -72,7 +72,7 @@ class PredictPipeline:
 
                 model_pred = (model_proba >= threshold).astype(int)
                 logging.info(f'Model prediction : {model_pred}')
-                return model_pred
+                return model_pred,model_proba*100
 
 
 
@@ -90,7 +90,7 @@ def averaging_prob(probs):
     try:
         threshold = 0.3 # Set from independent testing of ensemble classification
         avg_prob = np.mean(probs)
-        return (avg_prob > threshold).astype(int)
+        return (avg_prob > threshold).astype(int),avg_prob*100
     except Exception as e:
         raise CustomException(e,sys)
 

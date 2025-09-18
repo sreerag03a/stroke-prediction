@@ -52,16 +52,17 @@ def predict_datapoint():
             featurelist = ['gender','age','hypertension','heart_disease','ever_married','work_type','Residence_type','avg_glucose_level','bmi','smoking_status']
             
             values_dict = {feature : request.form.get(feature) for feature in featurelist}
-
             data = CustomData(values_dict)
             pred_df = data.get_dataframe()
             logging.info(pred_df)
             values_dict.update({'model': model})
 
             try: 
+                print(values_dict)
                 logging.info('Prediction pipeline started')
                 results = predpipeline.predictstroke(pred_df,model)
                 logging.info('Prediction pipeline completed')
+
                 print(results)
                 return render_template('predict.html', results = results,prev_input = values_dict)
             
