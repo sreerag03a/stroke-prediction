@@ -23,9 +23,9 @@ def predict_datapoint():
     if request.method == 'GET':
         return render_template('predict.html')
 
-    elif request.methods == 'POST':
+    elif request.method == 'POST':
         f = request.files.get('file')
-        model = request.files.get('model')
+        model = request.form.get('model')
 
         if f and f.filename.strip() != '':
             logging.info('Reading file...')
@@ -49,19 +49,21 @@ def predict_datapoint():
             except Exception as e:
                 raise CustomException(e,sys)
         else:
-            featurelist = ['gender','age','hypertension','heart_disease','ever_married','work_type','Residence_type','avg_glucose_level','bmi,smoking_status']
+            featurelist = ['gender','age','hypertension','heart_disease','ever_married','work_type','Residence_type','avg_glucose_level','bmi','smoking_status']
             
             values_dict = {feature : request.form.get(feature) for feature in featurelist}
 
             data = CustomData(values_dict)
             pred_df = data.get_dataframe()
+            logging.info(pred_df)
+            values_dict.update({'model': model})
 
             try: 
                 logging.info('Prediction pipeline started')
                 results = predpipeline.predictstroke(pred_df,model)
                 logging.info('Prediction pipeline completed')
                 print(results)
-                return render_template('predict.html', results = results[0])
+                return render_template('predict.html', results = results,prev_input = values_dict)
             
             except Exception as e:
                 raise CustomException(e,sys)

@@ -16,7 +16,7 @@ class PredictPipeline:
         pass
 
 
-    def predictstroke(self,features,selected_model=None):
+    def predictstroke(self,features,selected_model):
         '''
         The main prediction function used in the Flask app to predict the occurence of stroke
         
@@ -29,7 +29,7 @@ class PredictPipeline:
             preprocessor_path = 'outputs/models/preprocessor.pkl'
             logging.info('Loading preprocessor for data...')
 
-            preprocessor_obj = load_obj(preprocessor_path)
+            preprocessor_obj = load_obj(preprocessor_path)[0]
             
             logging.info('Attempting preprocessor')
             data_transformed = preprocessor_obj.transform(features)
@@ -48,7 +48,8 @@ class PredictPipeline:
                 lgr_proba = lgr.predict_proba(data_transformed)[:,1]
                 lgr_pred = (lgr_proba>= lgr_threshold).astype(int)
 
-                predictions = [lgbm_pred,lsvc_pred,lgr_pred]
+                predictions = [lgbm_pred[0],lsvc_pred[0],lgr_pred[0]]
+                logging.info(predictions)
                 return maj_vote(predictions)
             
             elif selected_model == 'Averaged Model':
@@ -61,14 +62,16 @@ class PredictPipeline:
                 lgr_proba = lgr.predict_proba(data_transformed)[:,1]
 
                 probs = [lgbm_proba,lsvc_proba,lgr_proba]
+                logging.info(probs)
                 
                 return averaging_prob(probs)
             else:
                 modelpath = f'outputs/models/{selected_model}.pkl'
                 model,threshold = load_obj(modelpath)
-                model_proba = model.predict_proba(data_transformed)
+                model_proba = model.predict_proba(data_transformed)[:,1]
 
                 model_pred = (model_proba >= threshold).astype(int)
+                logging.info(f'Model prediction : {model_pred}')
                 return model_pred
 
 
@@ -100,16 +103,16 @@ class CustomData:
     def get_dataframe(self):
         try:
             data_dict = {
-                'gender': self.datavector['gender'],
-                'age':self.datavector['age'],
-                'hypertension': self.datavector['hypertension'],
-                'heart_disease': self.datavector['heart_disease'],
-                'ever_married': self.datavector['ever_married'],
-                'work_type' : self.datavector['work_type'],
-                'Residence_type': self.datavector['Residence_type'],
-                'avg_glucose_level': self.datavector['avg_glucose_level'],
-                'bmi': self.datavector['bmi'],
-                'smoking_status': self.datavector['smoking_status']
+                'gender': [self.datavector['gender']],
+                'age':[int(self.datavector['age'])],
+                'hypertension': [int(self.datavector['hypertension'])],
+                'heart_disease': [int(self.datavector['heart_disease'])],
+                'ever_married': [self.datavector['ever_married']],
+                'work_type' : [self.datavector['work_type']],
+                'Residence_type': [self.datavector['Residence_type']],
+                'avg_glucose_level': [self.datavector['avg_glucose_level']],
+                'bmi': [self.datavector['bmi']],
+                'smoking_status': [self.datavector['smoking_status']]
             }
             return pd.DataFrame(data_dict)
         

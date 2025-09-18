@@ -1,1 +1,124 @@
-Hello This is a work in progress
+<html>
+  <body>
+    <h1>Stroke Prediction</h1>
+    <div class="login">
+       
+   
+       <form action="{{ url_for('predict_datapoint')}}" method="post" enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label class="form-label">Gender : </label>
+            <select class="form-label" name = "gender">
+                <option value = "Male"{% if prev_input and prev_input.model == 'Male' %}selected{% endif %}>Male</option>
+                <option value = "Female"{% if prev_input and prev_input.model == 'Female' %}selected{% endif %}>Female</option>
+                <option value = "Other"{% if prev_input and prev_input.model == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter Age : </label>
+            <input class="form-control" type="number" step = "1" name="age"
+                placeholder="Enter Age" min='1' max='120' 
+                value="{{ prev_input.age if prev_input and 'age' in prev_input else '' }}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Hypertension : </label>
+            <select class="form-label" name = "hypertension">
+                <option value = 1{% if prev_input and prev_input.model == 1 %}selected{% endif %}>Yes</option>
+                <option value = 0{% if prev_input and prev_input.model == 0 %}selected{% endif %}>No</option>
+            </select>
+        </div>
+
+
+        <div class="mb-3">
+            <label class="form-label">Heart Disease : </label>
+            <select class="form-label" name = "heart_disease">
+                <option value = 1{% if prev_input and prev_input.model == 1 %}selected{% endif %}>Yes</option>
+                <option value = 0{% if prev_input and prev_input.model == 0 %}selected{% endif %}>No</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Ever Married : </label>
+            <select class="form-label" name = "ever_married">
+                <option value = 'Yes'{% if prev_input and prev_input.model == 1 %}selected{% endif %}>Yes</option>
+                <option value = 'No'{% if prev_input and prev_input.model == 0 %}selected{% endif %}>No</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Work type : </label>
+            <select class="form-label" name = "work_type">
+                <option value = 'Private'{% if prev_input and prev_input.model == 'Private' %}selected{% endif %}>Private</option>
+                <option value = 'Self-employed'{% if prev_input and prev_input.model == 'Self-employed' %}selected{% endif %}>Self-employed</option>
+                <option value = 'Govt_job'{% if prev_input and prev_input.model == 'Govt_job' %}selected{% endif %}>Government Job</option>
+                <option value = 'children'{% if prev_input and prev_input.model == 'children' %}selected{% endif %}>Child/Student</option>
+                <option value = 'Never_worked'{% if prev_input and prev_input.model == 'Never_worked' %}selected{% endif %}>Fresher/Never worked</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Residence type : </label>
+            <select class="form-label" name = "Residence_type">
+                <option value = 'Urban'{% if prev_input and prev_input.model == 'Urban' %}selected{% endif %}>Urban</option>
+                <option value = 'Rural'{% if prev_input and prev_input.model == 'Rural' %}selected{% endif %}>Rural</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter average blood glucose level : </label>
+            <input class="form-control" type="number" step = "any" name="avg_glucose_level"
+                placeholder="Avg glucose level" min='50' max='600' 
+                value="{{ prev_input.avg_glucose_level if prev_input and 'avg_glucose_level' in prev_input else '' }}"/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Enter BMI : </label>
+            <input class="form-control" type="number" step = "any" name="bmi"
+                placeholder="BMI" min='5' max='50' 
+                value="{{ prev_input.bmi if prev_input and 'bmi' in prev_input else '' }}"/>
+        </div>
+        
+
+        <div class="mb-3">
+            <label class="form-label">Smoking status : </label>
+            <select class="form-label" name = "smoking_status">
+                <option value = 'formerly smoked'{% if prev_input and prev_input.model == 'formerly smoked' %}selected{% endif %}>formerly smoked</option>
+                <option value = 'never smoked'{% if prev_input and prev_input.model == 'never smoked' %}selected{% endif %}>never smoked</option>
+                <option value = 'smokes'{% if prev_input and prev_input.model == 'smokes' %}selected{% endif %}>smokes</option>
+                <option value = 'Unknown'{% if prev_input and prev_input.model == 'Unknown' %}selected{% endif %}>Unknown</option>
+            </select>
+        </div>
+
+
+        <label class="form-label">Select Model to use : </label>
+        <select class="form-control" name="model">
+    <option value="Majority Voting" {% if prev_input and prev_input.model == 'Majority Voting' %}selected{% endif %}>Majority Voting</option>
+    <option value="Averaged Model"{% if prev_input and prev_input.model == 'Averaged Model' %}selected{% endif %}>Averaged Model</option>
+    <option value="Logistic Regression"{% if prev_input and prev_input.model == 'Logistic Regression' %}selected{% endif %}>Logistic Regression</option>
+    <option value="Random Forest Classifier"{% if prev_input and prev_input.model == 'Random Forest Classifier' %}selected{% endif %}>Random Forest Classifier</option>
+    <option value="Linear SVC"{% if prev_input and prev_input.model == 'Linear SVC' %}selected{% endif %}>Linear SVC</option>
+    <option value="XGBoost Classifier"{% if prev_input and prev_input.model == 'XGBoost Classifier' %}selected{% endif %}>XGBoost Classifier</option>
+    <option value="Gradient Boosting Classifier"{% if prev_input and prev_input.model == 'Gradient Boosting Classifier' %}selected{% endif %}>Gradient Boosting Classifier</option>
+    <option value="LightGBM Classifier"{% if prev_input and prev_input.model == 'LightGBM Classifier' %}selected{% endif %}>LightGBM Classifier</option>
+    <option value="K Neighbors Classifier"{% if prev_input and prev_input.model == 'K Neighbors Classifier' %}selected{% endif %}>K Neighbors Classifier</option>
+</select>
+<h1>OR</h1>
+
+
+    
+
+            <fieldset>
+            <legend>🔹 Batch Prediction</legend>
+            <input type="file" name="file" accept=".csv">
+            <p>CSV format: gender,age,heart_disease,...</p>
+        </fieldset>
+                <div class="mb-3">
+            <input class="btn btn-primary" type="submit" value="Predict Stroke possibility" required />
+        </div>
+        </form>
+    </div>
+<h2>The patient is predicted to {{ 'have stroke.' if results == 1 else 'not have stroke.' }}</h2>
+  </body>
+</html>
