@@ -4,7 +4,7 @@ import numpy as np
 
 from src.handling.logger import logging
 from src.handling.exceptions import CustomException  
-from src.handling.utils import download_data
+from src.handling.utils import download_data,metrics_img
 from src.model.data_transform import DataIngestion,DataTransform
 from src.pipeline.train_pipeline import Train_Pipeline
 
@@ -36,6 +36,8 @@ if __name__ == "__main__":
         # print(np.where(np.isnan(incomplete_train_data)))
         trainer = Train_Pipeline()
         trainer.train_models(incomplete_train_data,test_data)
+
+        metrics_img()
 
         logging.info('Project successfully staged.')
     except Exception as e:

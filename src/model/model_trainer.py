@@ -24,7 +24,7 @@ def evaluate_models(X_train,y_train,X_test,y_test,pipelines,params):
             samplername = name.split('_')[0]
             paramgrid = params[modelname]
             logging.info(f'Optimizing {modelname} with oversampler : {samplername}')
-            gs = GridSearchCV(pipe,paramgrid,scoring = 'average_precision',cv=3,n_jobs = -2)
+            gs = GridSearchCV(pipe,paramgrid,scoring = 'average_precision',cv=5,n_jobs = -2)
             gs.fit(X_train,y_train)
 
             fitted_model = gs.best_estimator_.named_steps['model']
@@ -64,7 +64,7 @@ def evaluate_models(X_train,y_train,X_test,y_test,pipelines,params):
                 fitted_models[modelname] = {}
             if modelname not in all_scores:
                 all_scores[modelname] = {}
-            results[modelname][samplername] = precision[1]
+            results[modelname][samplername] = recall[1]
             fitted_models[modelname][samplername] = [fitted_model,threshold_val]
             all_scores[modelname][samplername] = scores
             

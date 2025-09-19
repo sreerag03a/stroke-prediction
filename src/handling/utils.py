@@ -6,6 +6,8 @@ import dill
 from src.handling.logger import logging
 from src.handling.exceptions import CustomException
 from kaggle.api.kaggle_api_extended import KaggleApi
+import json
+import matplotlib.pyplot as plt
 
 
 
@@ -52,5 +54,29 @@ def load_obj(filepath):
         raise CustomException(e,sys)
     
 
-    
+def metrics_img():
+    with open("outputs/model_scores.json", "r") as f:
+        scores = json.load(f)
+
+
+    df = pd.DataFrame(scores).T.round(4)
+
+
+    fig, ax = plt.subplots(figsize=(15, 4))
+    ax.axis("off")
+    df.index = df.index.str.replace(r'_.+$', '', regex=True)
+    table = ax.table(
+        cellText=df.values,
+        colLabels=df.columns,
+        rowLabels=df.index,
+        loc="center",
+        cellLoc="center"
+    )
+
+    table.auto_set_font_size(False)
+    table.set_fontsize(9)
+    table.scale(1, 1)  
+
+    # Saving model scores table as image
+    plt.savefig("outputs/metrics.png", dpi=300, bbox_inches="tight")
 

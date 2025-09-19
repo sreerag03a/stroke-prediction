@@ -71,8 +71,8 @@ class Train_Pipeline:
             "XGBoost Classifier" : XGBClassifier(scale_pos_weight=21.5),
             "Gradient Boosting Classifier" : GradientBoostingClassifier(),
             "K Neighbors Classifier": KNeighborsClassifier(),
-            "Voting Classifier" : VotingClassifier(estimators=base_models,voting='soft'),
-            "Stacking Classifier": StackingClassifier(estimators=base_models,final_estimator=LGBMClassifier(class_weight='balanced'))
+            "Voting Classifier" : VotingClassifier(estimators=base_models,voting='soft',n_jobs=1),
+            "Stacking Classifier": StackingClassifier(estimators=base_models,final_estimator=RandomForestClassifier(class_weight='balanced'),n_jobs=1)
 
         }
         params ={
@@ -103,21 +103,20 @@ class Train_Pipeline:
             },
             "Voting Classifier" : {
                 # 'model__lr__C': [0.01, 0.1, 1, 10],
-                'model__lr__solver': ['lbfgs', 'liblinear', 'saga'],
-                'model__rf__n_estimators': [100, 300],
+                # 'model__lr__solver': ['lbfgs', 'liblinear', 'saga'],
+                # 'model__rf__n_estimators': [100, 300],
                 # 'model__rf__max_depth': [5, 10],
-                'model__svc__C': [0.1, 1, 10],
+                # 'model__svc__C': [0.1, 1, 10],
                 # 'model__svc__kernel': ['linear', 'rbf']
             },
             "Stacking Classifier": {
                 # 'model__lr__C': [0.01, 0.1, 1, 10],
-                'model__lr__solver': ['lbfgs', 'liblinear', 'saga'],
-                'model__rf__n_estimators': [150, 300],
+                # 'model__lr__solver': ['lbfgs', 'liblinear', 'saga'],
+                # 'model__rf__n_estimators': [150, 300],
                 # 'model__rf__max_depth': [5, 10],
-                'model__svc__C': [0.1, 1, 10],
+                # 'model__svc__C': [0.1, 1, 10],
                 # 'model__svc__kernel': ['linear', 'rbf'],
-                'model__final_estimator__n_estimators': [150,300],
-                'model__final_estimator__learning_rate': [0.01,0.1],
+                # 'model__final_estimator__n_estimators': [150,300],
                 # "model__final_estimator__max_depth": [3, 5],
                 # "model__final_estimator__num_leaves": [31, 63],
                 # "model__final_estimator__min_child_samples":[40,80]
@@ -146,7 +145,8 @@ class Train_Pipeline:
                 best_model_oversampler = list(all_scores[model])[max_score_index]
                 model_scores = all_scores[model][best_model_oversampler]
                 print(f'{model}: {model_scores}')
-                saved_scores[model] = model_scores
+                
+                saved_scores[f'{model}_{best_model_oversampler}'] = model_scores
                 finalized_models[model] = [best_model,threshold]
             with open(self.config.model_scores_path,'w') as f:
                 json.dump(saved_scores,f,indent=4)

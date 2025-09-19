@@ -35,13 +35,13 @@ This automatically downloads the data and trains all the models (Note that this 
 
 #### Models
 
-1. Logistic Regression
-2. Random Forests Classifier
-3. Linear Support Vector Machine
-4. XGBoost Classifier
-5. Gradient Boosting Classifier
-6. LightGBM Classifier
-7. K Neighbors Classifier
+1. Linear Support Vector Machine
+2. XGBoost Classifier
+3. Gradient Boosting Classifier
+4. K Neighbors Classifier
+5. Logistic Regression (within Voting and Stacking Classifiers)
+6. Random Forest Classifier (within Voting and Stacking Classifiers)
+7. Support Vector Machine (within Voting and Stacking Classifiers)
 
 ### Evaluation Metrics
 
